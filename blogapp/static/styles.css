@@ -1,0 +1,33 @@
+body {
+    vertical-align: middle;
+}
+
+img {
+    max-width: 50%;
+    height: auto;
+}
+
+article {
+    margin: auto;
+}
+article header, article section {
+    /* inline-size: 150px; */
+    margin: auto;
+    overflow-wrap: break-word;
+}
+
+
+form {
+    text-align: center;
+    margin: 10px 0px 10px 0px;
+}
+form input, form button, form label {
+    display: block;
+    margin: auto;
+    margin-block: 10px;
+}
+
+
+footer {
+    text-align: center;
+}

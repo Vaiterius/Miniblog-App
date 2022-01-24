@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block main %}
+    <section class="my-4">
+        <form action="/login" method="post">
+            <div class="mb-1">
+                <label for="username" class="form-label"></label>
+                <input name="username" id="username" class="form-control mx-auto w-auto" type="text" placeholder="Username"
+                    minlength="{{ min_username_length }}" maxlength="{{ max_username_length }}" required autofocus>
+            </div>
+            <div class="mb-1">
+                <label for="password" class="form-label"></label>
+                <input name="password" id="password" class="form-control mx-auto w-auto" type="password" placeholder="Password"
+                    minlength="{{ min_pass_length }}" required>
+            </div>
+            <button class="btn btn-primary">Log in</button>
+        </form>
+    </section>
+{% endblock %}

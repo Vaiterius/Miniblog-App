@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}Create Post{% endblock %}
+
+{% block main %}
+    <section class="container">
+        <form action="/create_post" method="post">
+            <div class="row mb-2">
+                <label for="title" class="form-label">Enter a title:</label>
+                <input name="title" class="form-control mx-auto w-50" type="text" id="title" autocomplete="off" autofocus>
+            </div>
+            <div class="row mb-2">
+                <div class="col"></div>
+                <div class="col-9">
+                    <label for="content" class="form-label">Enter content:</label>
+                    <textarea name="content" class="form-control" id="content" autocomplete="off" autofocus></textarea>
+                </div>
+                <div class="col"></div>
+            </div>
+            <button class="btn btn-primary">Upload</button>
+        </form>
+    </section>
+{% endblock %}

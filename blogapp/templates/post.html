@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ post.author.first_name }}'s post{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row g-5 my-2">
+            <!-- Blog post -->
+            <section class="col-md-8">
+                <hr class="my-4">
+                <article class="shadow p-3 mb-5 bg-body">
+                    <header>
+                        <h3>{{ post.title }}</h3>
+                        <h4>By <a href="/user/{{ post.author.username }}">{{ post.author.first_name }} {{ post.author.last_name }}</a></h4>
+                        <h4>Uploaded on {{ post.date_posted }}</h4>
+                    </header>
+                    <section>
+                        {{ post.content | safe }}
+                    </section>
+                </article>
+            </section>
+            <!-- The sidebar -->
+            <aside class="col-md-4">
+                Hii
+            </aside>
+        </div>
+    </div>
+{% endblock %}
