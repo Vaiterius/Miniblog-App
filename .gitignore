@@ -3,5 +3,6 @@ venv
 
 flask_session
 migrations
+tests
 
 __pycache__/

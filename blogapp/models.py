@@ -1,5 +1,5 @@
 from __future__ import annotations
-from blogapp import db, form_constraints as fc
+from blogapp import db, fc
 
 # A self-referential association table to link users and their followers.
 followers = db.Table(

@@ -4,24 +4,11 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-# Initialize flask app and database model.
-app = Flask(__name__)
+db = SQLAlchemy()
+session = Session()
+migrate = Migrate()
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-# Ensure templates are auto-reloaded.
-app.config["TEMPLATES_AUTO_RELOAD"] = True
-
-# Configure session to use filesystem in lieu of signed cookies.
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-
-Session(app)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-form_constraints = {
+fc = {
     "min_username_length": 3,
     "max_username_length": 32,
 
@@ -31,4 +18,29 @@ form_constraints = {
     "max_name_length": 50,
 }
 
-import blogapp.routes
+
+def create_app():
+    """Create Flask application"""
+    # Initialize flask app and database model.
+    app = Flask(__name__, instance_relative_config=False)
+    app.config.from_object("config.DevConfig")
+
+    session.init_app(app)
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    with app.app_context():
+        # Import parts of our application.
+        from .contexts import contexts_bp
+        from .main.routes import main_bp
+        from .auth.routes import auth_bp
+        from .errors.handlers import errors_bp
+
+        # Register blueprints.
+        app.register_blueprint(contexts_bp)
+        app.register_blueprint(main_bp)
+        app.register_blueprint(auth_bp)
+        app.register_blueprint(errors_bp)
+
+        return app
+
