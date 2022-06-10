@@ -9,14 +9,14 @@
             <section class="col-md-8">
                 {% for post in posts %}
                     <hr class="my-4">
-                    <article class="shadow p-3 mb-5 bg-body">
-                        <header>
-                            <h3><a href="/post/id={{ post.id }}">{{ post.title }}</a></h3>
+                    <article class="post shadow p-3 mb-5 bg-body">
+                        <header class="post-header">
+                            <h2><a href="/post/id={{ post.id }}">{{ post.title }}</a></h2>
                             <h4>By <a href="/user/{{ post.author.username }}">{{ post.author.first_name }} {{ post.author.last_name }}</a></h4>
-                            <h4>Uploaded on {{ post.date_posted }}</h4>
+                            <h4 class="text-muted">Uploaded on {{ post.date_posted }}</h4>
                         </header>
-                        <section class="text-truncate">
-                            {{ post.content | safe }}
+                        <section class="post-content text-truncate">
+                            {{ post.content | truncate(150) | safe }}
                         </section>
                         {% if session["user_id"] %}
                         <!-- <button class="btn btn-outline-info btn-sm" onclick="like({{ post.id }}, {{ session['user_id'] }})">Like</button> -->
@@ -27,7 +27,7 @@
             </section>
             <!-- The sidebar -->
             <aside class="col-md-4">
-                Hii
+                This is the sidebar
             </aside>
         </div>
     </div>

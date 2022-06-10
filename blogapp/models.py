@@ -39,6 +39,14 @@ class Users(db.Model):
         return self.users_followed.filter(
             followers.c.followed_id == user.id
         ).count() > 0
+    
+    def followed_posts(self):
+        """Return posts of users followed by session user"""
+        return Posts.query.join(  # Join tables of user's posts and user's followers.
+            followers, followers.c.followed_id == Posts.id
+        ).filter(  # Filter table to posts whose user is being followed by session user.
+            followers.c.follower_id == self.id
+        ).order_by(Posts.date_posted.desc())  # Recent posts are up top first.
 
 
 class Posts(db.Model):

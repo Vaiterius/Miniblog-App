@@ -7,13 +7,19 @@ img {
     height: auto;
 }
 
-article {
-    margin: auto;
-}
-article header, article section {
-    /* inline-size: 150px; */
+.post {
     margin: auto;
     overflow-wrap: break-word;
+}
+.post-header a {
+    text-decoration: none;
+    color: inherit;
+}
+.post-header a:hover {
+    text-decoration: underline;
+}
+.post-header h4 {
+    font-size: small;
 }
 
 

@@ -28,7 +28,8 @@ main_bp = Blueprint(
 def index():
     """User's homepage after logging or signing in"""
     # Fetch posts of user and whoever the user follows.
-    posts = Posts.query.all()
+    session_user = Users.query.get(session["user_id"])
+    posts = session_user.followed_posts()
     return render_template("index.html", posts=posts)
 
 
@@ -53,13 +54,6 @@ def create_post():
             flash("Must fill in all fields!", "error")
             return render_template("create_post.html"), 400
         
-        # if len(title) < 10:
-        #     flash("Title must have at least 10 characters", "error")
-        #     return render_template("create_post.html"), 400
-        # if len(content) < 100:
-        #     flash("Content must have at least 100 characters", "error")
-        #     return render_template("create_post.html"), 400
-        
         new_post = Posts(
             author_id=user_id,
             title=title,
@@ -74,41 +68,6 @@ def create_post():
         return redirect("/")
 
     return render_template("create_post.html")
-
-
-# @main_bp.route("/follow_unfollow", methods=["POST"])
-# @login_required
-# def follow_unfollow():
-#     """Follow or unfollow the given user"""
-#     # Receive AJAX response data for user to follow.
-#     data = request.get_json(force=True)
-#     user = Users.query.filter_by(username=data["username"]).first_or_404()
-#     action = data["action"]
-#     session_user = Users.query.get(session["user_id"])
-
-#     # Perform desired action depending on if user is to be followed or unfollowed.
-#     if not user:
-#         flash("Unable to follow nonexistent user", "error")
-#         return redirect("/")
-    
-#     if action == "follow":
-#         if not session_user.is_following(user):
-#             session_user.users_followed.append(user)
-#             db.session.commit()
-#             # flash(f"Now following {user.username}", "success")
-#         # else:
-#             # flash("You are already following this user", "error")
-#     elif action == "unfollow":
-#         if session_user.is_following(user):
-#             session_user.users_followed.remove(user)
-#             db.session.commit()
-#             # flash(f"You have unfollowed {user.username}", "success")
-#         # else:
-#             # flash("You are not already following this user", "error")
-#     print(data)
-#     new_data = {"username": data["username"], "action": data["action"]}
-#     print(new_data)
-#     return make_response(jsonify(new_data), 200)
 
 
 @main_bp.route("/follow_test", methods=["POST"])
@@ -153,4 +112,4 @@ def view_post(post_id):
     if post is None:
         flash("Post does not exist", "error")
         return redirect("/")
-    return render_template("post.html", post=post)
+    return render_template("post_view.html", post=post)
