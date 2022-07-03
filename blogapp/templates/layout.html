@@ -14,8 +14,11 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 
-    <!-- Stylesheet and scripts -->
+    <!-- Stylesheet, font, and scripts -->
     <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 
     <!-- TinyMCE editor plugin -->
     <script src="https://cdn.tiny.cloud/1/7ae3o5uzrewft335mf4ud5h2gjdlqeba7jiqb383naymbd5b/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
@@ -29,6 +32,13 @@
 
     <!-- Title template -->
     <title>{% block title %}{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+
+    <!-- Flask-Moment -->
+    {{ moment.include_moment() }}
+    {{ moment.locale(auto_detect=True) }}
 </head>
 
 <body>
@@ -109,7 +119,7 @@
 
     <!-- Footer info -->
     <footer>
-        <p>&copy;{{ get_datetime(time="year") }} Your mom</p>
+        <p>&copy;{{ moment().format("YYYY") }} Gerard G.</p>
     </footer>
 </body>
 

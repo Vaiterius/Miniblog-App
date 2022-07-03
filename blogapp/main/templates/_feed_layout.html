@@ -1,0 +1,8 @@
+<section class="col-md-8">
+    {% for post in posts %}
+        {% include '_post.html' %}
+        <hr class="my-4">
+    {% else %}  <!-- No posts found to be viewed -->
+        <h2>No posts yet. Bruh.</h2>
+    {% endfor %}
+</section>

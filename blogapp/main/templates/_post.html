@@ -1,0 +1,74 @@
+<article class="post shadow p-3 mb-5 bg body">
+
+    <!-- Post headings -->
+    <header class="post-header">
+        <h2><a href="/post/id={{ post.id }}">{{ post.title }}</a></h2>
+        <table>
+            <tr valign="middle">
+                <th rowspan="2"><img class="pfp-post" src="{{ post.author.get_avatar() }}" alt="user profile picture"></th>
+                <th><h4>By <a href="/user/{{ post.author.username }}">{{ post.author.first_name }} {{ post.author.last_name }}</a></h4></th>
+                <th><h4>&#8226;</h4></th>
+                <th><h4 class="text-muted">Uploaded on {{ moment(post.date_posted).format("LLL") }}</h4></th>
+            </tr>
+
+            <!-- Post options for editing, sharing, or deleting -->
+            {% if post.author.id == session["user_id"] %}
+            <div class="dropdown">
+                <button href="#" class="btn btn-secondary btn-sm dropdown-toggle" role="button" id="post_options" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                <ul class="dropdown-menu" aria-labelledby="post_options">
+                    <li><a class="dropdown-item disabled" href="#">Edit post (WIP)</a></li>
+                    <li>
+                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#confirm">
+                            Delete post
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Pop-up modal for confirming post deletion -->
+            <div class="modal fade" id="confirm" tabindex="-1" aria-labelledby="confirm_label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <!-- Pop-up header -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirm_label">Confirm deletion?</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <!-- Pop-up body text -->
+                        <div class="modal-body">
+                            This action cannot be undone.
+                        </div>
+                        <!-- Pop-up footer with buttons -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <form action="/delete_post/id={{ post.id }}">
+                                <button type="submit" class="btn btn-danger">Delete post</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </table>
+    </header>
+
+    <!-- Post description if exists -->
+    {% if post.description %}
+        <section class="post-content text-muted">
+            {{ post.description | safe }}
+        </section>
+    {% endif %}
+
+    <!-- Post content goes here if viewing post individually -->
+    {% if indiv_view is defined %}
+        <section class="post-content">
+            {{ post.content | safe }}
+        </section>
+    {% endif %}
+
+    <!-- Like button to be implemented -->
+    {% if session["user_id"] %}
+    <!-- <button class="btn btn-outline-info btn-sm" onclick="like({{ post.id }}, {{ session['user_id'] }})">Like</button> -->
+    <a href=""></a>
+    {% endif %}
+</article>

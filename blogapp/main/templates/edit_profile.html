@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block title %} Edit Profile {% endblock %}
+
+{% block main %}
+    <section class="container">
+        <form action="/edit_profile" method="post">
+
+            <!-- Editing username -->
+            <div class="row mb-2">
+                <label for="username" class="form-label" >Edit username:</label>
+                <input name="username" class="form-control mx-auto w-50" type="text" id="username" value="{{ current_username }}" 
+                    minlength="{{ min_username_length }}" maxlength="{{ max_username_length }}" autocomplete="off" required>
+            </div>
+
+            <!-- Editing optional bio -->
+            <div class="row mb-2">
+                <div class="col"></div>
+                <div class="col-9">
+                    <label for="about_me" class="form-label">Edit bio:</label>
+                    <textarea name="about_me" class="form-control" id="about_me"
+                    maxLength="{{ max_bio_length }}" autocomplete="off">{{ current_about_me }}</textarea>
+                </div>
+                <div class="col"></div>
+            </div>
+            <button class="btn btn-primary">Submit</button>
+        </form>
+    </section>
+{% endblock %}

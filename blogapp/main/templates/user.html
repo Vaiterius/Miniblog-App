@@ -3,16 +3,54 @@
 {% block title %}Profile | {{ user.username }}{% endblock %}
 
 {% block main %}
-    <h1>Welcome to {{ user.username }}'s profile</h1>
-    {% if session["user_id"] %}
-        {% if not session_user.is_following(user) %}
-            <button class="btn btn-info btn-sm" id="follow-unfollow-button"
-                onclick="followUnfollow2('{{ user.username }}')">Follow</button>
-        {% else %}
-            <button class="btn btn-info btn-sm" id="follow-unfollow-button"
-                onclick="followUnfollow2('{{ user.username }}')">Unfollow</button>
-        {% endif %}
-        <p id="onclick-status"></p>
-    {% endif %}
+
+    <div class="container">
+        <div class="row g-3 my-2">
+            <section class="post shadow p-3 mb-4 my-4 bg body">
+
+                <!-- User information -->
+                <div class="profile">
+                    <img class="pfp-profile" src="{{ user.get_avatar() }}" alt="user profile picture">
+                    {% if session_user == user %}
+                        <h1>Hey there, {{ user.username }}!</h1>
+                    {% else %}
+                        <h1>Welcome to {{ user.username }}'s profile</h1>
+                    {% endif %}
+                    <p><span class="profile-header">Name:</span> {{ user.first_name }} {{ user.last_name }}</p>
+                    <p><span class="profile-header">Bio:</span> {% if user.about_me %} {{ user.about_me }} {% else %} User does not have a bio. {% endif %}</p>
+                    <p><span class="profile-header">Last seen:</span> {% if user.last_seen %} {{ moment(user.last_seen).calendar() }} {% endif %}</p>
+                    <p>{{ user.user_followers.count() }} followers, {{ user.users_followed.count() }} following</p>
+                    <p>
+                        {% if user == session_user %}
+                            <a href="/edit_profile">Edit your profile</a>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <!-- Follow button -->
+                {% if session["user_id"] and user.id != session["user_id"] %}
+                    {% if not session_user.is_following(user) %}
+                        <button class="btn btn-info btn-sm" id="follow-unfollow-button"
+                            onclick="followUnfollow2('{{ user.username }}')">Follow</button>
+                    {% else %}
+                        <button class="btn btn-info btn-sm" id="follow-unfollow-button"
+                            onclick="followUnfollow2('{{ user.username }}')">Unfollow</button>
+                    {% endif %}
+                    <p id="onclick-status"></p>
+                {% endif %}
+            </section>
+        </div>
+
+        <hr> <!-- Separate general info and posts/sidebar -->
+
+        <!-- User's own posts -->
+        <div class="row g-4 my-2">
+
+            {% include '_feed_layout.html' %}
+
+            {% include '_sidebar.html' %}
+        </div>
+    </div>
+
     <script src="{{ url_for('main_bp.static', filename='js/follow_unfollow.js') }}"></script>
 {% endblock %}

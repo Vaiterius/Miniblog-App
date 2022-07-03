@@ -3,10 +3,12 @@ from flask import Flask
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_moment import Moment
 
 db = SQLAlchemy()
 session = Session()
 migrate = Migrate()
+moment = Moment()
 
 fc = {
     "min_username_length": 3,
@@ -16,6 +18,12 @@ fc = {
 
     "min_name_length": 2,
     "max_name_length": 50,
+
+    "max_bio_length": 140,
+
+    "max_title_length": 100,
+    "max_desc_length": 200,
+    "max_content_length": 3000,
 }
 
 
@@ -24,10 +32,12 @@ def create_app():
     # Initialize flask app and database model.
     app = Flask(__name__, instance_relative_config=False)
     app.config.from_object("config.DevConfig")
+    app.url_map.strict_slashes = False
 
     session.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
+    moment.init_app(app)
 
     with app.app_context():
         # Import parts of our application.
@@ -37,7 +47,7 @@ def create_app():
         from .errors.handlers import errors_bp
 
         # Register blueprints.
-        app.register_blueprint(contexts_bp)
+        app.register_blueprint(contexts_bp)           
         app.register_blueprint(main_bp)
         app.register_blueprint(auth_bp)
         app.register_blueprint(errors_bp)

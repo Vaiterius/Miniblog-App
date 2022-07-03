@@ -5,19 +5,32 @@
 {% block main %}
     <section class="container">
         <form action="/create_post" method="post">
+
+            <!-- Entering a title -->
             <div class="row mb-2">
                 <label for="title" class="form-label">Enter a title:</label>
-                <input name="title" class="form-control mx-auto w-50" type="text" id="title" autocomplete="off" autofocus>
+                <input name="title" class="form-control mx-auto w-50" type="text" id="title"
+                    maxLength="{{ max_title_length }}" autocomplete="off" required autofocus>
             </div>
+
+            <!-- Entering the description -->
+            <div class="row mb-2">
+                <label for="desc" class="form-label">Enter a description (optional):</label>
+                <input name="desc" class="form-control max-auto w-75" type="text" id="desc"
+                    maxLength="{{ max_desc_length }}" autocomplete="off" autofocus>
+            </div>
+
+            <!-- Entering the content -->
             <div class="row mb-2">
                 <div class="col"></div>
-                <div class="col-9">
+                <div class="col-10">
                     <label for="content" class="form-label">Enter content:</label>
-                    <textarea name="content" class="form-control" id="content" autocomplete="off" autofocus></textarea>
+                    <textarea name="content" class="form-control max-auto w-75" id="content"
+                    maxLength="{{ max_content_length }}" autocomplete="off" autofocus></textarea>
                 </div>
                 <div class="col"></div>
             </div>
-            <button class="btn btn-primary">Upload</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
         </form>
     </section>
 {% endblock %}
