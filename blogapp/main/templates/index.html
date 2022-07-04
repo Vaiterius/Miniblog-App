@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block main %}
     <div class="container">
         <div class="row g-4 my-2">
-            <h1 class="header">Home</h1>
+            <h1 class="header">{{ title }}</h1>
 
-            <!-- Individual blog posts -->
+            <!-- Feed layout -->
             {% include '_feed_layout.html' %}
-            
+
             <!-- The sidebar -->
             {% include '_sidebar.html' %}
         </div>

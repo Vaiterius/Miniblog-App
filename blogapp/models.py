@@ -18,6 +18,7 @@ class Users(db.Model):
     last_name = db.Column(db.String(fc["max_name_length"]), nullable=False)
     hash = db.Column(db.String(), nullable=False)
     about_me = db.Column(db.String(fc["max_bio_length"]))
+    # joined = db.Column(db.DateTime, default=datetime.utcnow)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     posts = db.relationship("Posts", backref="author", lazy="dynamic")

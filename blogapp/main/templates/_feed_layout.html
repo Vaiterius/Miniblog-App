@@ -5,4 +5,18 @@
     {% else %}  <!-- No posts found to be viewed -->
         <h2>No posts yet. Bruh.</h2>
     {% endfor %}
+
+    <!-- Pagination -->
+    <div class="float-right">
+        {% if prev_url %}
+            <a href="{{ prev_url }}">Newer posts</a>
+        {% else %}
+            <a class="disabled text-muted">Newer posts</a>
+        {% endif %}
+        {% if next_url %}
+            <a href="{{ next_url }}">Older posts</a>
+        {% else %}
+            <a class="disabled text-muted">Older posts</a>
+        {% endif %}
+    </div>
 </section>

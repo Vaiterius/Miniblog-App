@@ -11,6 +11,7 @@ class Config:
     FLASK_APP = environ.get("FLASK_APP")
     FLASK_ENV = environ.get("FLASK_ENV")
     SECRET_KEY = environ.get("SECRET_KEY")
+    POSTS_PER_PAGE = int(environ.get("POSTS_PER_PAGE"))
 
     SESSION_PERMANENT = False
     SESSION_TYPE = "filesystem"

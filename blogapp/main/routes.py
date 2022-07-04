@@ -1,13 +1,9 @@
 """Routes for main blog components"""
 from flask import (
     Blueprint,
-    render_template,
-    make_response,
-    redirect,
-    jsonify,
-    flash,
-    request,
-    session
+    render_template, make_response, redirect, jsonify,
+    flash, url_for,
+    request, session, current_app
 )
 
 from blogapp import db, fc
@@ -23,21 +19,81 @@ main_bp = Blueprint(
 )
 
 
+#[-------------------------------------------------------------------]
+# TEMPLATE VIEWS
+#[-------------------------------------------------------------------]
+
+
 @main_bp.route("/")
+@main_bp.route("/index")
 @login_required
 def index():
     """User's homepage after logging or signing in"""
     # Fetch posts of user and whoever the user follows.
     session_user = Users.query.get(session["user_id"])
-    posts = session_user.followed_posts(is_descending=True)
-    return render_template("index.html", posts=posts)
+
+    page = request.args.get("page", default=1, type=int)  # Pagination.
+    posts = session_user.followed_posts(is_descending=True).paginate(
+        page, current_app.config["POSTS_PER_PAGE"], False)
+    
+    next_url = url_for("main_bp.index", page=posts.next_num) if posts.has_next else None
+    prev_url = url_for("main_bp.index", page=posts.prev_num) if posts.has_prev else None
+
+    return render_template( "index.html",
+        title="Home", posts=posts.items, next_url=next_url, prev_url=prev_url)
 
 
 @main_bp.route("/global")
 def global_posts():
     """Blog posts of everyone"""
-    posts = Posts.get_posts(is_descending=True)
-    return render_template("global.html", posts=posts)
+    page = request.args.get("page", default=1, type=int)  # Pagination.
+    posts = Posts.get_posts(is_descending=True).paginate(
+        page, current_app.config["POSTS_PER_PAGE"], False)
+    
+    next_url = url_for("main_bp.global_posts", page=posts.next_num) if posts.has_next else None
+    prev_url = url_for("main_bp.global_posts", page=posts.prev_num) if posts.has_prev else None
+
+    return render_template( "index.html",
+        title="Global", posts=posts.items, next_url=next_url, prev_url=prev_url)
+
+
+@main_bp.route("/user/<username>")
+def user(username):
+    """View the profile of a user and all their blog posts"""
+    user = Users.query.filter_by(username=username).first_or_404()
+    session_user = None
+    if session.get("user_id"):
+        session_user = Users.query.get(session["user_id"])
+
+    page = request.args.get("page", default=1, type=int)
+    posts = user.own_posts(is_descending=True).paginate(
+        page, current_app.config["POSTS_PER_PAGE"], False)
+
+    next_url = url_for("main_bp.user",
+        username=username, page=posts.next_num) if posts.has_next else None
+    prev_url = url_for("main_bp.user",
+        username=username, page=posts.prev_num) if posts.has_prev else None
+
+    return render_template("user.html",
+        user=user, session_user=session_user, posts=posts.items, next_url=next_url, prev_url=prev_url)
+
+
+@main_bp.route("/post/id=<post_id>")
+def view_post(post_id):
+    """View an individual blog post"""
+    post = Posts.query.get(post_id)
+    if post is None:
+        flash("Post does not exist", "error")
+        return redirect("/")
+    session_user = None
+    if session.get("user_id"):
+        session_user = Users.query.get(session["user_id"])
+    return render_template("post_view.html", post=post, session_user=session_user, indiv_view=True)
+
+
+#[-------------------------------------------------------------------]
+# FORMS
+#[-------------------------------------------------------------------]
 
 
 @main_bp.route("/create_post", methods=["GET", "POST"])
@@ -90,23 +146,60 @@ def create_post():
     return render_template("create_post.html")
 
 
-@main_bp.route("/delete_post/id=<post_id>")
+@main_bp.route("/edit_profile", methods=["GET", "POST"])
 @login_required
-def delete_post(post_id):
-    """User deletes own post"""
-    post = Posts.query.get(post_id)
+def edit_profile():
+    """An editable interface for User to edit their profile info"""
+    user_id = session["user_id"]
+    user = Users.query.get(user_id)
+    current_username = user.username
+    current_about_me = user.about_me
 
-    # Ensure post can only be deleted by its owner.
-    if post.author_id != session["user_id"]:
-        flash("Cannot delete post", "error")
-        return redirect("/")
+    if request.method == "POST":
+        username = request.form.get("username").strip()
+        about_me = request.form.get("about_me").strip()
 
-    db.session.delete(post)
-    db.session.commit()
+        # Check if forms are filled.
+        if not username:
+            flash("Must have at least a username!", "error")
+            return redirect("/edit_profile")
+        
+        # Check valid username length.
+        if len(username) < fc["min_username_length"] or len(username) > fc["max_username_length"]:
+            flash("Username must be between 3 and 32 characters long!", "error")
+            return redirect("/edit_profile")
+        
+        # Check if username already exists.
+        check_username = None
+        if current_username != username:  # Don't have to check if username is the same.
+            check_username = Users.query.filter(Users.username.like(username)).first()
+        if check_username:
+            flash("Username already exists", "error")
+            return redirect("/edit_profile")
+        
+        # Check valid about me length.
+        if len(about_me) > fc["max_bio_length"]:
+            flash("Bio should not exceed 140 characters!", "error")
+            return redirect("/edit_profile")
 
-    flash("Post deleted!", "success")
+        user.username = username
+        user.about_me = about_me
+        db.session.commit()
+        
+        flash("Your profile has been edited", "success")
 
-    return redirect("/")
+        return redirect("/profile")
+
+    return render_template(
+        "edit_profile.html",
+        current_username=current_username,
+        current_about_me=current_about_me)
+
+
+#[-------------------------------------------------------------------]
+# NON-TEMPLATE REQUESTS & REDIRECTIONS
+#[-------------------------------------------------------------------]
+
 
 @main_bp.route("/follow_user", methods=["POST"])
 @login_required
@@ -161,84 +254,30 @@ def like_post():
     return make_response(jsonify(new_data))
 
 
-@main_bp.route("/user/<username>")
-def user(username):
-    """View the profile of a user and all their blog posts"""
-    user = Users.query.filter_by(username=username).first_or_404()
-    session_user = None
-    if session["user_id"]:
-        session_user = Users.query.get(session["user_id"])
-    posts = user.own_posts(is_descending=True)
-    return render_template("user.html", user=user, session_user=session_user, posts=posts)
-
-
 @main_bp.route("/profile")
 def profile():
     """After clicking to visit their own profile"""
     session_user = None
-    if session["user_id"]:
+    if session.get("user_id"):
         session_user = Users.query.get(session["user_id"])
     return redirect(f"/user/{session_user.username}")
 
 
-@main_bp.route("/post/id=<post_id>")
-def view_post(post_id):
-    """View an individual blog post"""
-    post = Posts.query.get(post_id)
-    if post is None:
-        flash("Post does not exist", "error")
-        return redirect("/")
-    session_user = None
-    if session["user_id"]:
-        session_user = Users.query.get(session["user_id"])
-    return render_template("post_view.html", post=post, session_user=session_user, indiv_view=True)
-
-
-@main_bp.route("/edit_profile", methods=["GET", "POST"])
+@main_bp.route("/delete_post/id=<post_id>")
 @login_required
-def edit_profile():
-    """An editable interface for User to edit their profile info"""
-    user_id = session["user_id"]
-    user = Users.query.get(user_id)
-    current_username = user.username
-    current_about_me = user.about_me
+def delete_post(post_id):
+    """User deletes own post"""
+    post = Posts.query.get(post_id)
 
-    if request.method == "POST":
-        username = request.form.get("username").strip()
-        about_me = request.form.get("about_me").strip()
+    # Ensure post can only be deleted by its owner.
+    if post.author_id != session["user_id"]:
+        flash("Cannot delete post", "error")
+        return redirect("/")
 
-        # Check if forms are filled.
-        if not username:
-            flash("Must have at least a username!", "error")
-            return redirect("/edit_profile")
-        
-        # Check valid username length.
-        if len(username) < fc["min_username_length"] or len(username) > fc["max_username_length"]:
-            flash("Username must be between 3 and 32 characters long!", "error")
-            return redirect("/edit_profile")
-        
-        # Check if username already exists.
-        check_username = None
-        if current_username != username:  # Don't have to check if username is the same.
-            check_username = Users.query.filter(Users.username.like(username)).first()
-        if check_username:
-            flash("Username already exists", "error")
-            return redirect("/edit_profile")
-        
-        # Check valid about me length.
-        if len(about_me) > fc["max_bio_length"]:
-            flash("Bio should not exceed 140 characters!", "error")
-            return redirect("/edit_profile")
+    db.session.delete(post)
+    db.session.commit()
 
-        user.username = username
-        user.about_me = about_me
-        db.session.commit()
-        
-        flash("Your profile has been edited", "success")
+    flash("Post deleted!", "success")
 
-        return redirect("/profile")
+    return redirect("/")
 
-    return render_template(
-        "edit_profile.html",
-        current_username=current_username,
-        current_about_me=current_about_me)

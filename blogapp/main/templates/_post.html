@@ -67,8 +67,8 @@
 
         <!-- Like button  -->
         <div class="like-button">
-            <span id="num-likes">{{ post.likes.count() }}</span>
             {% if session["user_id"] %}
+                <span id="num-likes">{{ post.likes.count() }}</span>
                 {% if session_user.has_liked(post.id) %}
                     <input type="image" id="like-button"
                         src="{{ url_for('main_bp.static', filename='images/liked.png') }}"
