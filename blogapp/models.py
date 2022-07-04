@@ -21,6 +21,7 @@ class Users(db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     posts = db.relationship("Posts", backref="author", lazy="dynamic")
+    posts_liked = db.relationship("PostLikes", backref="author", lazy="dynamic")
 
     # This was so damn difficult to understand.
     users_followed = db.relationship(
@@ -40,6 +41,9 @@ class Users(db.Model):
     
     def get_avatar(self, size: int=64):
         return f"https://ui-avatars.com/api/?name={self.first_name}+{self.last_name}&background=random&size={size}"
+    
+    def has_liked(self, post_id):
+        return PostLikes.query.filter_by(post_id=post_id, liker_id=self.id).count() > 0
     
     def is_following(self, user: Users) -> bool:
         """Return True if User is following the user in the given parameter"""
@@ -73,6 +77,8 @@ class Posts(db.Model):
     content = db.Column(db.Text, nullable=False)
     description = db.Column(db.String(fc["max_desc_length"]))
     date_posted = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    likes = db.relationship("PostLikes", backref="post", lazy="dynamic")
     
     def get_posts(is_descending=False):
         """Return all posts with optional descending order"""
@@ -85,4 +91,5 @@ class PostLikes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
     liker_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    date_liked = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 

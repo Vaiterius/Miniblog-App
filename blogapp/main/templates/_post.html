@@ -64,11 +64,32 @@
         <section class="post-content">
             {{ post.content | safe }}
         </section>
-    {% endif %}
 
-    <!-- Like button to be implemented -->
-    {% if session["user_id"] %}
-    <!-- <button class="btn btn-outline-info btn-sm" onclick="like({{ post.id }}, {{ session['user_id'] }})">Like</button> -->
-    <a href=""></a>
+        <!-- Like button  -->
+        <div class="like-button">
+            <span id="num-likes">{{ post.likes.count() }}</span>
+            {% if session["user_id"] %}
+                {% if session_user.has_liked(post.id) %}
+                    <input type="image" id="like-button"
+                        src="{{ url_for('main_bp.static', filename='images/liked.png') }}"
+                        onclick="likePost('{{ post.id }}')" />
+                {% else %}
+                    <input type="image" id="like-button"
+                        src="{{ url_for('main_bp.static', filename='images/unliked.png') }}"
+                        onclick="likePost('{{ post.id }}')" />
+                {% endif %}
+            {% endif %}
+        </div>
+    {% else %}
+
+    <!-- Likes and comments preview -->
+        <div class="credit-links">
+            {% set num_likes = post.likes.count() %}
+            {% if num_likes == 1 %}
+                <a href="/post/id={{ post.id }}">{{ num_likes }} like, 0 comments</a>
+            {% else %}
+                <a href="/post/id={{ post.id }}">{{ num_likes }} likes, 0 comments</a>
+            {% endif %}
+        </div>
     {% endif %}
 </article>

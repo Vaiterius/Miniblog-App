@@ -54,6 +54,16 @@ th, td {
     width: 36px;
 }
 
+#like-button {
+    height: auto;
+    width: 20px;
+}
+
+.credit-links, .credit-links a {
+    font-size: small;
+    color: inherit;
+    text-decoration: none;
+}
 
 form {
     text-align: center;

@@ -31,12 +31,12 @@
                 {% if session["user_id"] and user.id != session["user_id"] %}
                     {% if not session_user.is_following(user) %}
                         <button class="btn btn-info btn-sm" id="follow-unfollow-button"
-                            onclick="followUnfollow2('{{ user.username }}')">Follow</button>
+                            onclick="followUser('{{ user.id }}')">Follow</button>
                     {% else %}
                         <button class="btn btn-info btn-sm" id="follow-unfollow-button"
-                            onclick="followUnfollow2('{{ user.username }}')">Unfollow</button>
+                            onclick="followUser('{{ user.id }}')">Unfollow</button>
                     {% endif %}
-                    <p id="onclick-status"></p>
+                    <p id="onfollow-status"></p>
                 {% endif %}
             </section>
         </div>
@@ -52,5 +52,5 @@
         </div>
     </div>
 
-    <script src="{{ url_for('main_bp.static', filename='js/follow_unfollow.js') }}"></script>
+    <script src="{{ url_for('main_bp.static', filename='js/follow_user.js') }}"></script>
 {% endblock %}

@@ -11,7 +11,7 @@ from flask import (
 )
 
 from blogapp import db, fc
-from blogapp.models import Users, Posts
+from blogapp.models import Users, Posts, PostLikes
 from blogapp.utilities import login_required
 
 # Blueprint creation.
@@ -108,28 +108,56 @@ def delete_post(post_id):
 
     return redirect("/")
 
-@main_bp.route("/follow_test", methods=["POST"])
+@main_bp.route("/follow_user", methods=["POST"])
 @login_required
-def follow_test():
+def follow_user():
+    """Process request when user is followed by another user"""
     data = request.get_json(force=True)
-    user = Users.query.filter_by(username=data["username"]).first_or_404()
+    followed_user = Users.query.filter_by(id=data["followed_id"]).first_or_404()
     session_user = Users.query.get(session["user_id"])
 
-    if not user:
+    if not followed_user:
         flash("Unable to follow nonexistent user", "error")
         return redirect("/")
     
     new_data = dict()
 
-    if not session_user.is_following(user):
-        session_user.users_followed.append(user)
+    if not session_user.is_following(followed_user):
+        session_user.users_followed.append(followed_user)
         new_data["performed"] = "followed"
     else:
-        session_user.users_followed.remove(user)
+        session_user.users_followed.remove(followed_user)
         new_data["performed"] = "unfollowed"
 
     db.session.commit()
     
+    return make_response(jsonify(new_data))
+
+
+@main_bp.route("/like_post", methods=["POST"])
+@login_required
+def like_post():
+    """Process request when post is liked by user"""
+    data = request.get_json(force=True)
+    post_like = PostLikes.query.filter_by(post_id=data["post_id"], liker_id=session["user_id"]).first()
+    session_user = Users.query.get(session["user_id"])
+
+    new_data = dict()
+
+    if session_user.has_liked(data["post_id"]):
+        db.session.delete(post_like)
+        new_data["liked"] = False
+
+    else:
+        post_like = PostLikes(post_id=data["post_id"], liker_id=session["user_id"])
+        db.session.add(post_like)
+        new_data["liked"] = True
+
+    db.session.commit()
+
+    post = Posts.query.get(data["post_id"])
+    new_data["num_likes"] = post.likes.count()
+
     return make_response(jsonify(new_data))
 
 
@@ -160,7 +188,10 @@ def view_post(post_id):
     if post is None:
         flash("Post does not exist", "error")
         return redirect("/")
-    return render_template("post_view.html", post=post, indiv_view=True)
+    session_user = None
+    if session["user_id"]:
+        session_user = Users.query.get(session["user_id"])
+    return render_template("post_view.html", post=post, session_user=session_user, indiv_view=True)
 
 
 @main_bp.route("/edit_profile", methods=["GET", "POST"])
