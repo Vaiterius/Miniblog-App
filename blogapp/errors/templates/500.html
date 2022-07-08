@@ -4,7 +4,10 @@
 
 {% block main %}
     <div class="container my-4">
-        <h1>:(</h1>
-        <p>{{ message }}</p>
+        <div class="text-center">
+            <h1>500</h1>
+            <p>{{ message }}</p>
+            <img class="img-fluid rounded mx-auto d-block" src="{{ url_for('errors_bp.static', filename='images/bruh.jpg') }}" alt="">
+        </div>
     </div>
 {% endblock %}

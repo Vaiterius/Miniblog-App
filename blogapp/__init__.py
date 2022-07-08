@@ -24,6 +24,8 @@ fc = {
     "max_title_length": 100,
     "max_desc_length": 200,
     "max_content_length": 3000,
+
+    "max_comment_length": 1000,
 }
 
 

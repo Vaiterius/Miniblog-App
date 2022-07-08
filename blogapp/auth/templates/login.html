@@ -15,7 +15,12 @@
                 <input name="password" id="password" class="form-control mx-auto w-auto" type="password" placeholder="Password"
                     minlength="{{ min_pass_length }}" required>
             </div>
+            <div class="mb-1">
+                <span id="forgot-password" onclick="troll()">Forgot your password?</span>
+            </div>
             <button class="btn btn-primary">Bruhlog in</button>
         </form>
     </section>
+
+    <script src="{{ url_for('auth_bp.static', filename='js/troll.js') }}"></script>
 {% endblock %}

@@ -1,4 +1,4 @@
-<article class="post shadow p-3 mb-5 bg body">
+<article class="post shadow p-3 mb-4 bg body">
 
     <!-- Post headings -->
     <header class="post-header">
@@ -14,7 +14,7 @@
             <!-- Post options for editing, sharing, or deleting -->
             {% if post.author.id == session["user_id"] %}
             <div class="dropdown">
-                <button href="#" class="btn btn-secondary btn-sm dropdown-toggle" role="button" id="post_options" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                <button href="#" class="btn btn-outline-secondary btn-sm dropdown-toggle" role="button" id="post_options" data-bs-toggle="dropdown" aria-expanded="false"></button>
                 <ul class="dropdown-menu" aria-labelledby="post_options">
                     <li><a class="dropdown-item disabled" href="#">Edit post (WIP)</a></li>
                     <li>
@@ -26,7 +26,7 @@
             </div>
 
             <!-- Pop-up modal for confirming post deletion -->
-            <div class="modal fade" id="confirm" tabindex="-1" aria-labelledby="confirm_label" aria-hidden="true">
+            <div class="modal fade" id="confirm" aria-labelledby="confirm_label" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <!-- Pop-up header -->
@@ -85,10 +85,11 @@
     <!-- Likes and comments preview -->
         <div class="credit-links">
             {% set num_likes = post.likes.count() %}
+            {% set num_comments = post.comments.count() %}
             {% if num_likes == 1 %}
-                <a href="/post/id={{ post.id }}">{{ num_likes }} like, 0 comments</a>
+                <a href="/post/id={{ post.id }}">{{ num_likes }} like, {{ num_comments }} comments</a>
             {% else %}
-                <a href="/post/id={{ post.id }}">{{ num_likes }} likes, 0 comments</a>
+                <a href="/post/id={{ post.id }}">{{ num_likes }} likes, {{ num_comments }} comments</a>
             {% endif %}
         </div>
     {% endif %}

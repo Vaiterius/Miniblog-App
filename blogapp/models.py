@@ -23,6 +23,7 @@ class Users(db.Model):
 
     posts = db.relationship("Posts", backref="author", lazy="dynamic")
     posts_liked = db.relationship("PostLikes", backref="author", lazy="dynamic")
+    posts_commented = db.relationship("PostComments", backref="author", lazy="dynamic")
 
     # This was so damn difficult to understand.
     users_followed = db.relationship(
@@ -61,7 +62,7 @@ class Users(db.Model):
     def followed_posts(self, is_descending=False):
         """Return posts of users followed by session user combined with own posts"""
         followed_posts =  Posts.query.join(  # Join tables of user's posts and user's followers.
-            followers, followers.c.followed_id == Posts.id
+            followers, followers.c.followed_id == Posts.author_id
         ).filter(  # Filter table to posts whose user is being followed by session user.
             followers.c.follower_id == self.id)
         own_posts = self.own_posts()
@@ -80,6 +81,7 @@ class Posts(db.Model):
     date_posted = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     likes = db.relationship("PostLikes", backref="post", lazy="dynamic")
+    comments = db.relationship("PostComments", backref="post", lazy="dynamic")
     
     def get_posts(is_descending=False):
         """Return all posts with optional descending order"""
@@ -93,4 +95,12 @@ class PostLikes(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
     liker_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     date_liked = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+
+class PostComments(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    commenter_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
+    date_commented = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    comment = db.Column(db.String(fc["max_comment_length"]), nullable=False)
 

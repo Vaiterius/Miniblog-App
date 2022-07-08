@@ -7,7 +7,7 @@ from flask import (
 )
 
 from blogapp import db, fc
-from blogapp.models import Users, Posts, PostLikes
+from blogapp.models import Users, Posts, PostLikes, PostComments
 from blogapp.utilities import login_required
 
 # Blueprint creation.
@@ -82,13 +82,28 @@ def user(username):
 def view_post(post_id):
     """View an individual blog post"""
     post = Posts.query.get(post_id)
+
     if post is None:
         flash("Post does not exist", "error")
         return redirect("/")
+
     session_user = None
     if session.get("user_id"):
         session_user = Users.query.get(session["user_id"])
-    return render_template("post_view.html", post=post, session_user=session_user, indiv_view=True)
+    
+    page = request.args.get("page", default=1, type=int)
+    comments = PostComments.query.filter_by(post_id=post_id).order_by(
+        PostComments.date_commented.desc()).paginate(
+            page, current_app.config["POSTS_PER_PAGE"], False)
+    
+    next_url = url_for("main_bp.view_post",
+        post_id=post_id, page=comments.next_num) if comments.has_next else None
+    prev_url = url_for("main_bp.view_post",
+        post_id=post_id, page=comments.prev_num) if comments.has_prev else None
+
+    return render_template("post_view.html",
+        post=post, session_user=session_user, comments=comments.items,
+        next_url=next_url, prev_url=prev_url, indiv_view=True)
 
 
 #[-------------------------------------------------------------------]
@@ -144,6 +159,32 @@ def create_post():
         return redirect("/")
 
     return render_template("create_post.html")
+
+
+@main_bp.route("/create_comment/post_id=<post_id>", methods=["POST"])
+@login_required
+def create_comment(post_id):
+    """User submits comment under post"""
+    comment = request.form.get("comment").strip()
+    
+    # Ensure comment length adheres to the max length it can be.
+    if len(comment) > fc["max_comment_length"]:
+        flash(f"Comment exceeds maximum of {fc['max_comment_length']} characters!", "error")
+        return redirect(f"/post/id={post_id}")
+    
+    user_id = session["user_id"]
+    post_comment = PostComments(
+        commenter_id=user_id,
+        post_id=post_id,
+        comment=comment
+    )
+
+    db.session.add(post_comment)
+    db.session.commit()
+
+    flash("Successfully posted comment!", "success")
+
+    return redirect(f"/post/id={post_id}")
 
 
 @main_bp.route("/edit_profile", methods=["GET", "POST"])
@@ -273,6 +314,10 @@ def delete_post(post_id):
     if post.author_id != session["user_id"]:
         flash("Cannot delete post", "error")
         return redirect("/")
+    
+    # Also delete any likes and comments associated with the post.
+    PostLikes.query.filter_by(post_id=post_id).delete()
+    PostComments.query.filter_by(post_id=post_id).delete()
 
     db.session.delete(post)
     db.session.commit()
@@ -280,4 +325,25 @@ def delete_post(post_id):
     flash("Post deleted!", "success")
 
     return redirect("/")
+
+
+@main_bp.route("/delete_comment/id=<comment_id>")
+@login_required
+def delete_comment(comment_id):
+    """User deletes own comment"""
+    print(comment_id)
+    comment = PostComments.query.get(comment_id)
+    print(comment)
+
+    # Ensure comment can only be deleted by its author or the post author.
+    if comment.commenter_id != session["user_id"] and comment.post.author_id != session["user_id"]:
+        flash("Cannot delete comment", "error")
+        return redirect(f"/post/id={comment.post_id}")
+    
+    db.session.delete(comment)
+    db.session.commit()
+
+    flash("Comment deleted!", "success")
+
+    return redirect(f"/post/id={comment.post_id}")
 

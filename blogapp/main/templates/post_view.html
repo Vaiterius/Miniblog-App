@@ -9,6 +9,88 @@
             <!-- Blog post -->
             <section class="col-md-8">
                 {% include '_post.html' %}
+
+                <!-- Comments section -->
+                <section> <!-- User submits comment here -->
+                    <h5>Comments ({{ post.comments.count() }})</h5>
+                    <div class="mb-4 comment">
+                        <form action="/create_comment/post_id={{ post.id }}" method="post">
+                            <textarea name="comment" id="comment-textarea" class="form-control" rows="1" onfocus="onCommentAction('focus')" placeholder="Share your thoughts!" required></textarea>
+                            <div class="text-end" id="comment-button" style="display: none;">
+                                <button type="reset" class="btn btn-outline-danger mx-2" onclick="onCommentAction('reset')">Cancel</button>
+                                <button type="submit" class="btn btn-outline-secondary">Comment</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+                <section> <!-- Other people's comments -->
+                    {% for comment in comments %}
+                        <hr>
+                        <div class="row comment-options">
+
+                            <!-- Avatar -->
+                            <div class="col-md-1">
+                                <div>
+                                    <img src="https://ui-avatars.com/api/?name={{ comment.author.first_name }}+{{ comment.author.last_name }}&background=random">
+                                </div>
+                            </div>
+
+                            <!-- Comment info -->
+                            <div class="col-md-11">
+                                <div class="px-3">
+                                    <h5 style="display: inline; margin-right: 10px;">{{ comment.author.username }}</h5>
+                                    <span style="display: inline;">said {{ moment(comment.date_commented).fromNow() }}:</span>
+    
+                                    <!-- Comment options for author or post author-->
+                                    {% if comment.author.id == session["user_id"] or session["user_id"] == comment.post.author_id %}
+                                        <div style="float: right;">
+                                            <button class="btn-close text-end" data-bs-toggle="modal" data-bs-target="#confirm{{ comment.id }}"></button>
+
+                                            <!-- Pop-up modal for confirming post deletion -->
+                                            <div class="modal fade" id="confirm{{ comment.id }}" aria-labelledby="confirm_label" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <!-- Pop-up header -->
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="confirm_label">Confirm deletion?</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <!-- Pop-up body text -->
+                                                        <div class="modal-body">
+                                                            This action cannot be undone
+                                                        </div>
+                                                        <!-- Pop-up footer with buttons -->
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            <form action="/delete_comment/id={{ comment.id }}">
+                                                                <button type="submit" class="btn btn-danger">Delete comment</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    <p style="padding-top: 10px;">{{ comment.comment }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <!-- Pagination -->
+                    <div class="float-right">
+                        {% if prev_url %}
+                            <a href="{{ prev_url }}">Newer comments</a>
+                        {% else %}
+                            <a class="disabled text-muted">Newer comments</a>
+                        {% endif %}
+                        {% if next_url %}
+                            <a href="{{ next_url }}">Older comments</a>
+                        {% else %}
+                            <a class="disabled text-muted">Older comments</a>
+                        {% endif %}
+                    </div>
+                </section>
                 <hr class="my-4">
             </section>
 
@@ -18,4 +100,5 @@
     </div>
 
     <script src="{{ url_for('main_bp.static', filename='js/like_post.js') }}"></script>
+    <script src="{{ url_for('main_bp.static', filename='js/comments.js') }}"></script>
 {% endblock %}
