@@ -23,13 +23,17 @@ class Config:
     TEMPLATES_FOLDER = "templates"
     TEMPLATES_AUTO_RELOAD = True
 
+    LOG_TO_STDOUT = environ.get("LOG_TO_STDOUT")
+
 
 class ProdConfig(Config):
     """Production configuration"""
     DEBUG = False
     TESTING = False
 
-    SQLALCHEMY_DATABASE_URI = environ.get("PROD_DATABASE_URI")
+    SQLALCHEMY_DATABASE_URI = environ.get("PROD_DATABASE_URI", "").replace(
+        "postgres://", "postgresql://") or \
+        "sqlite:///" + path.join(basedir, "app.db")
     SQLALCHEMY_ECHO = False
 
 
