@@ -82,6 +82,9 @@ class Posts(db.Model):
 
     likes = db.relationship("PostLikes", backref="post", lazy="dynamic")
     comments = db.relationship("PostComments", backref="post", lazy="dynamic")
+
+    def get_ordered_likes():
+        return Posts.query.order_by(Posts.likes)
     
     def get_posts(is_descending=False):
         """Return all posts with optional descending order"""

@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit Post{% endblock %}
+
+{% block main %}
+    <section class="container">
+        <form action="/edit_post/id={{ post_id }}" method="post">
+
+            <!-- Editing the title -->
+            <div class="row mb-2">
+                <label for="title" class="form-label">Enter a title:</label>
+                <input name="title" class="form-control mx-auto w-50" type="text" id="title" value="{{ current_title }}"
+                    maxLength="{{ max_title_length }}" autocomplete="off" required autofocus>
+            </div>
+
+            <!-- Editing the description -->
+            <div class="row mb-2">
+                <label for="desc" class="form-label">Enter a description (optional):</label>
+                <input name="desc" class="form-control max-auto w-75" type="text" id="desc" value="{{ current_desc }}"
+                    maxLength="{{ max_desc_length }}" autocomplete="off" autofocus>
+            </div>
+
+            <!-- Editing the content -->
+            <div class="row mb-2">
+                <div class="col"></div>
+                <div class="col-10">
+                    <label for="content" class="form-label">Enter content:</label>
+                    <textarea name="content" class="form-control max-auto w-75" id="content"
+                    maxLength="{{ max_content_length }}" autocomplete="off" autofocus>{{ current_content }}</textarea>
+                </div>
+                <div class="col"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Edit</button>
+        </form>
+    </section>
+{% endblock %}

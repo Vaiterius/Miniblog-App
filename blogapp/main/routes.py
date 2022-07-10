@@ -237,6 +237,56 @@ def edit_profile():
         current_about_me=current_about_me)
 
 
+@main_bp.route("/edit_post/id=<post_id>", methods=["GET", "POST"])
+@login_required
+def edit_post(post_id):
+    """Interface for user to edit already-existing post"""
+    user_id = session["user_id"]
+    post = Posts.query.get(post_id)
+    current_title = post.title
+    current_desc = post.description
+    current_content = post.content
+    
+    if request.method == "POST":
+        title = request.form.get("title").strip()
+        desc = request.form.get("desc")
+        content = request.form.get("content").strip()
+
+        # Validate required fields.
+        if not title or not content:
+            flash("Title and content are required!", "error")
+            return render_template("edit_post.html", post_id=post_id), 400
+        
+        # Validate title length.
+        if len(title) > fc["max_title_length"]:
+            flash(f"Title length exceeds {fc['max_title_length']} characters", "error")
+            return render_template("edit_post.html", post_id=post_id), 400
+        
+        # Validate description length, if added.
+        if desc:
+            desc = desc.strip()
+            if len(desc) > fc["max_desc_length"]:
+                flash(f"Description length exceeds {fc['max_desc_length']} characters", "error")
+                return render_template("edit_post.html", post_id=post_id), 400
+
+        # Validate content length.
+        if len(content) > fc["max_content_length"]:
+            flash(f"Content length exceeds {fc['max_content_length']} characters", "error")
+            return render_template("edit_post.html", post_id=post_id), 400
+        
+        post.title = title
+        post.description = desc
+        post.content = content
+        db.session.commit()
+
+        flash("Your post has been updated!", "success")
+
+        return redirect(f"/post/id={post_id}")
+    
+    return render_template("edit_post.html", post_id=post_id,
+        current_title=current_title, current_desc=current_desc, current_content=current_content)
+
+
 #[-------------------------------------------------------------------]
 # NON-TEMPLATE REQUESTS & REDIRECTIONS
 #[-------------------------------------------------------------------]

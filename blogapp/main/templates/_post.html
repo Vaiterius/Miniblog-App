@@ -16,9 +16,13 @@
             <div class="dropdown">
                 <button href="#" class="btn btn-outline-secondary btn-sm dropdown-toggle" role="button" id="post_options" data-bs-toggle="dropdown" aria-expanded="false"></button>
                 <ul class="dropdown-menu" aria-labelledby="post_options">
-                    <li><a class="dropdown-item disabled" href="#">Edit post (WIP)</a></li>
                     <li>
-                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#confirm">
+                        <a class="dropdown-item" href="/edit_post/id={{ post.id }}">
+                            Edit post
+                        </a>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#confirm-{{ post.id }}">
                             Delete post
                         </button>
                     </li>
@@ -26,7 +30,7 @@
             </div>
 
             <!-- Pop-up modal for confirming post deletion -->
-            <div class="modal fade" id="confirm" aria-labelledby="confirm_label" aria-hidden="true">
+            <div class="modal fade" id="confirm-{{ post.id }}" aria-labelledby="confirm_label" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <!-- Pop-up header -->
@@ -36,6 +40,7 @@
                         </div>
                         <!-- Pop-up body text -->
                         <div class="modal-body">
+                            <p><strong>Deleting: </strong>{{ post.title }}</p>
                             This action cannot be undone.
                         </div>
                         <!-- Pop-up footer with buttons -->
@@ -54,15 +59,15 @@
 
     <!-- Post description if exists -->
     {% if post.description %}
-        <section class="post-content text-muted">
-            {{ post.description | safe }}
+        <section class="post-desc">
+            <div class="my-2">{{ post.description | safe }}</div>
         </section>
     {% endif %}
 
     <!-- Post content goes here if viewing post individually -->
     {% if indiv_view is defined %}
         <section class="post-content">
-            {{ post.content | safe }}
+            <div class="mt-4">{{ post.content | safe }}</div>
         </section>
 
         <!-- Like button  -->
@@ -83,7 +88,7 @@
     {% else %}
 
     <!-- Likes and comments preview -->
-        <div class="credit-links">
+        <div class="credits-links">
             {% set num_likes = post.likes.count() %}
             {% set num_comments = post.comments.count() %}
             {% if num_likes == 1 %}

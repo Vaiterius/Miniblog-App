@@ -34,7 +34,7 @@
     <title>{% block title %}{% endblock %}</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 
     <!-- Flask-Moment -->
     {{ moment.include_moment() }}
@@ -85,7 +85,7 @@
     <div class="flashes container">
         <div class="row">
             <div class="col"></div>
-            <div class="col align-self-center">
+            <div class="col align-self-center mt-3">
                 {% with messages =  get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}

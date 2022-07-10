@@ -8,6 +8,7 @@ h1, h2, h3, h4 {
     color: #3A3B3C;
 }
 
+
 table {
     border-collapse: separate;
     border-spacing: 0 1px;
@@ -32,6 +33,15 @@ th, td {
 }
 .post-header h4 {
     font-size: small;
+}
+.post-desc {
+    font-family: Roboto, Helvetica, sans-serif;
+    color: #696969;
+}
+.post-content img {
+    width: 100%;
+    height: auto;
+    max-width: 50vw;
 }
 
 .flashes button {
@@ -59,6 +69,16 @@ th, td {
     width: 36px;
 }
 
+.hot {
+    color: inherit;
+    text-decoration: none;
+}
+.hot:hover .card {
+    color: black;
+    /* text-decoration: underline; */
+    background-color: aliceblue;
+}
+
 #like-button {
     height: auto;
     width: 20px;
@@ -72,6 +92,16 @@ th, td {
     color: blue;
     text-decoration: underline;
 }
+
+.comment-header a {
+    text-decoration: none;
+    color: inherit;
+    font-size: larger;
+    font-weight: bold;
+}
+.comment-header:hover a {
+    text-decoration: underline;
+}
 .comment-options button {
     display: none;
 }
@@ -79,10 +109,9 @@ th, td {
     display: block;
 }
 
-.credit-links, .credit-links a {
+.credits-links a {
     font-size: small;
     color: inherit;
-    text-decoration: none;
 }
 
 form {

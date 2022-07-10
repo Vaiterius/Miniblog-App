@@ -1,9 +1,69 @@
 <!-- Sidebar component -->
 <aside class="col-md-4">
     <article class="shadow p-3 mb-5 bg body">
-        <h4>About</h4>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse viverra rhoncus sem sed pulvinar. Sed sapien libero, dapibus et libero at, bibendum ultricies magna. Praesent eu interdum erat, faucibus imperdiet quam. Phasellus risus felis, fringilla sit amet tortor ac, interdum consequat nulla. Pellentesque non sem dignissim, pharetra massa id, pharetra massa. Maecenas ac interdum tortor. Vivamus mollis commodo diam, non consectetur justo varius eu. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat vehicula ex, tempor tempor nisi accumsan et. Maecenas ac nunc a neque molestie efficitur.
-        <br>
-        <a class="credit-links" href="https://www.flaticon.com/free-icons/like" title="like icons">Like icons created by Pixel perfect - Flaticon</a>
+
+        <!-- Hottest posts sorted by most likes -->
+        <div class="sidebar-hot-posts my-4">
+            <h4>Hot Posts</h4>
+            <div class="mb-3">
+                {% for post in sidebar_posts %}
+                    <a class="hot" href="/post/id={{ post.id }}">
+                        <div class="card m-2 p-2">
+                            <span>{{ post.title }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+                {% if sidebar_posts.count() == 0 %}
+                    <p>No posts yet. Be the <a href="/create_post">first</a> one!</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Followings overview -->
+        <div class="sidebar-followings my-4">
+            <h4>Your followings</h4>
+            {% if sidebar_followings is defined %}
+                {% for following in sidebar_followings %}
+                    <div class="d-inline m-1">
+                        <a href="/user/{{ following.username }}" style="text-decoration: none;">
+                            <img class="mt-2" src="{{ following.get_avatar() }}" alt="{{ following.username }}">
+                        </a>
+                    </div>
+                {% endfor %}
+                {% if sidebar_followings.count() == 0 %}
+                    <p>Not following anyone. <a href="/global">Find </a>some people!</p>
+                {% endif %}
+            {% else %}
+                <p><a href="/login">Log in</a> to get involved!</p>
+            {% endif %}
+        </div>
+
+        <!-- About the blog! -->
+        <div class="sidebar-about my-4">
+            <h4>About</h4>
+            <p>
+                A mini blogging application powered by Python's Flask and SQLAlchemy. 
+            </p>
+            <p>
+                Follow bloggers, like articles, comment your thoughts&#8212;share with the world!
+            </p>
+            <p>
+                This project would not have existed without the knowledge and education provided by
+                <a target="_blank" href="https://cs50.harvard.edu/x/2022/">CS50x</a>,
+                <a target="_blank" href="https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world">Michael Grinberg</a>,
+                <a target="_blank" href="https://www.youtube.com/playlist?list=PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu">Tech With Tim</a>,
+                and more.
+            </p>
+            <p>
+                <!-- Github icon and source code link -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                  </svg>
+                <a target="_blank" href="https://github.com/Vaiterius/Miniblog-App"> Source code</a>
+            </p>
+            <div class="credits-links">
+                <a href="https://www.flaticon.com/free-icons/like" title="like icons">Like icons created by Pixel perfect - Flaticon</a>
+            </div>
+        </div>
     </article>
 </aside>

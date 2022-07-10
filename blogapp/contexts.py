@@ -1,9 +1,10 @@
 """Context processors and other useful functions"""
 from flask import Blueprint, session
+from sqlalchemy import func, desc, asc
 from datetime import datetime
 
 from blogapp import fc, db
-from blogapp.models import Users
+from blogapp.models import Users, Posts, PostLikes
 
 
 contexts_bp = Blueprint("contexts_bp", __name__)
@@ -14,6 +15,28 @@ def form_constraints():
     """Inject form constraints into login/signup fields"""
     return fc
 
+
+@contexts_bp.app_context_processor
+def followings_and_hot_posts():
+    """Decorate the sidebar with user followings and latest hot posts"""
+    sidebar_info = dict()
+
+    # Posts sorted by most likes.
+    sidebar_posts = Posts.query.join(
+        PostLikes).group_by(
+        Posts.id).order_by(
+        func.count().desc()).limit(5)
+    sidebar_info["sidebar_posts"] = sidebar_posts  # Still get hot posts when not logged in.
+
+    if not session.get("user_id"):
+        return sidebar_info
+
+    # List of user's followings.
+    sidebar_followings = Users.query.get(session["user_id"]).users_followed
+
+    sidebar_info["sidebar_followings"] = sidebar_followings
+
+    return sidebar_info
 
 @contexts_bp.before_app_request
 def before_request():

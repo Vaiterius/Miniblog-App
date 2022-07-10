@@ -31,15 +31,17 @@
                             <!-- Avatar -->
                             <div class="col-md-1">
                                 <div>
-                                    <img src="https://ui-avatars.com/api/?name={{ comment.author.first_name }}+{{ comment.author.last_name }}&background=random">
+                                    <img src="{{ comment.author.get_avatar() }}">
                                 </div>
                             </div>
 
                             <!-- Comment info -->
                             <div class="col-md-11">
                                 <div class="px-3">
-                                    <h5 style="display: inline; margin-right: 10px;">{{ comment.author.username }}</h5>
-                                    <span style="display: inline;">said {{ moment(comment.date_commented).fromNow() }}:</span>
+                                    <div class="comment-header">
+                                        <a style="display: inline; margin-right: 10px;" href="/user/{{ comment.author.username }}">{{ comment.author.username }}</a>
+                                        <span style="display: inline;">said {{ moment(comment.date_commented).fromNow() }}:</span>
+                                    </div>
     
                                     <!-- Comment options for author or post author-->
                                     {% if comment.author.id == session["user_id"] or session["user_id"] == comment.post.author_id %}
