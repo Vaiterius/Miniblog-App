@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}S3 Buckets{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12-xs">
+                <h3>Bucket List</h3>
+
+                <table class="table table-striped">
+                    <tr>
+                        <th>Bucket Name</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+
+                    {% for bucket in buckets %}
+                        <tr>
+                            <td>{{ bucket["Name"] }}</td>
+                            <td>{{ moment(bucket["CreationDate"]).fromNow() }}</td>
+                            <td>
+                                <form action="{{ url_for('main_bp.buckets') }}" method="POST" class="select-bucket">
+                                    <input type="hidden" name="bucket" value="{{ bucket['Name'] }}">
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="fa fa-archive"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

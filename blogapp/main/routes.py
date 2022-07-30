@@ -2,13 +2,13 @@
 from flask import (
     Blueprint,
     render_template, make_response, redirect, jsonify,
-    flash, url_for,
+    flash, url_for, Response,
     request, session, current_app
 )
 
 from blogapp import db, fc
 from blogapp.models import Users, Posts, PostLikes, PostComments
-from blogapp.utilities import login_required
+from blogapp.utilities import S3BucketUtils, login_required
 
 # Blueprint creation.
 main_bp = Blueprint(
@@ -104,6 +104,29 @@ def view_post(post_id):
     return render_template("post_view.html",
         post=post, session_user=session_user, comments=comments.items,
         next_url=next_url, prev_url=prev_url, indiv_view=True)
+
+
+@main_bp.route("/files")
+@login_required
+def files():
+    """View all the files uploaded on the s3 bucket"""
+    bucket = S3BucketUtils.get_bucket()
+    summaries = bucket.objects.all()
+
+    return render_template("files.html", bucket=bucket, files=summaries)
+
+
+@main_bp.route("/buckets", methods=["POST", "GET"])
+@login_required
+def buckets():
+    """View all the files uploaded on the s3 bucket"""
+    if request.method == "POST":
+        bucket = request.form["bucket"]
+        session["bucket"] = bucket
+        return redirect("/files")
+    else:
+        buckets = S3BucketUtils.get_bucket_list()
+        return render_template("buckets.html", buckets=buckets)
 
 
 #[-------------------------------------------------------------------]
@@ -285,6 +308,50 @@ def edit_post(post_id):
     
     return render_template("edit_post.html", post_id=post_id,
         current_title=current_title, current_desc=current_desc, current_content=current_content)
+
+
+@main_bp.route("/upload", methods=["POST"])
+@login_required
+def upload():
+    """Upload files into the s3 bucket for image storage"""
+    file = request.files["file"]
+
+    bucket = S3BucketUtils.get_bucket()
+    bucket.Object(file.filename).put(Body=file)
+
+    flash("Uploaded!", "success")
+
+    return redirect(url_for("main_bp.files"))
+
+
+@main_bp.route("/delete", methods=["POST"])
+@login_required
+def delete():
+    """Delete file from s3 bucket"""
+    key = request.form["key"]
+
+    bucket = S3BucketUtils.get_bucket()
+    bucket.Object(key).delete()
+
+    flash("File deleted successfully!", "success")
+
+    return redirect(url_for("main_bp.files"))
+
+
+@main_bp.route("/download", methods=["POST"])
+@login_required
+def download():
+    """Download file from s3 bucket"""
+    key = request.form["key"]
+
+    bucket = S3BucketUtils.get_bucket()
+    file_object = bucket.Object(key).get()
+
+    return Response(
+        file_object["Body"].read(),
+        mimetype="text/plain",
+        headers={"Content-Disposition": f"attachment;filename={key}"}
+    )
 
 
 #[-------------------------------------------------------------------]

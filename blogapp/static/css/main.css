@@ -114,6 +114,10 @@ th, td {
     color: inherit;
 }
 
+.td-buttons form {
+    display: inline-block;
+}
+
 form {
     text-align: center;
     margin: 10px 0px 10px 0px;

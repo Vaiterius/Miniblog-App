@@ -1,13 +1,15 @@
 """Initialize Flask application and SQLite database with configurations"""
 import os
 import logging
-from logging.handlers import SMTPHandler, RotatingFileHandler
+from logging.handlers import RotatingFileHandler
 
 from flask import Flask
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_moment import Moment
+
+from blogapp.utilities import file_type
 
 db = SQLAlchemy()
 session = Session()
@@ -37,8 +39,10 @@ def create_app():
     """Create Flask application"""
     # Initialize flask app and database model.
     app = Flask(__name__, instance_relative_config=False)
-    app.config.from_object("config.ProdConfig")
+    app.config.from_object("config.DevConfig")
+    # app.config.from_object("config.ProdConfig")
     app.url_map.strict_slashes = False
+    app.jinja_env.filters["file_type"] = file_type
 
     session.init_app(app)
     db.init_app(app)
@@ -55,7 +59,7 @@ def create_app():
             if not os.path.exists("logs"):
                 os.mkdir("logs")
             file_handler = RotatingFileHandler("logs/bruhlog.log",
-                max_bytes=10240, backupCount=10)
+                maxBytes=10240, backupCount=10)
             file_handler.setFormatter(logging.Formatter(
                 '%(asctime)s %(levelname)s: %(message)s '
                 '[in %(pathname)s:%(lineno)d]'))
