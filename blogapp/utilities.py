@@ -1,8 +1,11 @@
 import os
 import mimetypes
 from functools import wraps
+from datetime import datetime
 
 import boto3
+from urllib.parse import urlparse
+from bs4 import BeautifulSoup
 from flask import redirect, session, current_app
 
 additional_file_types = {
@@ -70,3 +73,26 @@ def file_type(key):
         
         return filetype
 
+
+def make_unique_url(filename):
+    """Add timestamp including millisecnds to make filename unique"""
+    file_info = os.path.splitext(filename)
+    file_extension = file_info[1]
+    filename = file_info[0] + "-" + datetime.now().strftime('%Y%m%d%H%M%S%f')
+    return filename + file_extension
+
+
+def extract_img_url(page_data):
+    """Given html data, return all occurrences of img src's"""
+    soup = BeautifulSoup(page_data, "html.parser")
+
+    images = []
+    for img in soup.findAll("img"):
+        images.append(img.get("src"))
+
+    return images
+
+
+def extract_key_from_url(url):
+    """Given an s3 object url, return the key (filename)"""
+    return urlparse(url).path.strip("/")

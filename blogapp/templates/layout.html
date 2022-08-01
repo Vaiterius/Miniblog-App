@@ -21,13 +21,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 
     <!-- TinyMCE editor plugin -->
-    <script src="https://cdn.tiny.cloud/1/7ae3o5uzrewft335mf4ud5h2gjdlqeba7jiqb383naymbd5b/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/7ae3o5uzrewft335mf4ud5h2gjdlqeba7jiqb383naymbd5b/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         tinymce.init({
-          selector: '#content',
-          height: 500,
-          plugins: "wordcount preview image fullscreen emoticons codesample autosave advancedlist"
-        });
+            selector: '#content',
+            height: 500,
+            plugins: 'advlist autolink lists link image charmap preview anchor pagebreak wordcount',
+            toolbar_mode: 'floating',
+            images_upload_url: "{{ url_for('main_bp.upload_image') }}",
+            automatic_uploads: false
+          });
     </script>
 
     <!-- Title template -->
