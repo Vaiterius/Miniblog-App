@@ -1,4 +1,5 @@
 """Routes for main blog components"""
+import os
 from flask import (
     Blueprint, Response,
     render_template, make_response, redirect, jsonify,
@@ -10,7 +11,7 @@ from werkzeug.utils import secure_filename
 from blogapp import db, fc
 from blogapp.models import Users, Posts, PostLikes, PostComments
 from blogapp.utilities import S3BucketUtils, login_required, extract_img_url,\
-    extract_key_from_url, make_unique_url
+    extract_key_from_url, make_unique_url, get_size
 
 # Blueprint creation.
 main_bp = Blueprint(
@@ -376,19 +377,24 @@ def edit_post(post_id):
 def upload_image():
     """Store file temporarily in folder before uploading to s3 bucket"""
     file = request.files.get("file")
+    print(file)
 
-    # Validate filesize, max 2MB.
+    # Validate filesize, max 1MB.
+    print("DEBUG 1")
+    size = get_size(file)
+    if size > 1_048_576:
+        print(size)
+        print("DEBUG 2")
+        # abort(Response("400 - file uploads are 1MB max in size"))
+        abort(500)
+    print("DEBUG 3")
 
     if file:
         filename = secure_filename(file.filename).lower()
         filename = make_unique_url(filename)
 
-        # Get accessable s3 URL for uploaded image.
-        location = S3BucketUtils.get_s3_session().client("s3").generate_presigned_url(
-            "get_object", Params={
-                "Bucket": current_app.config["S3_BUCKET"],
-                "Key": filename}
-        )
+        # Get publically-accessable s3 URL for uploaded image.
+        location = f"https://flask-bruhlog.s3.us-west-1.amazonaws.com/{filename}"
 
         # Place image in bucket.
         bucket = S3BucketUtils.get_bucket()

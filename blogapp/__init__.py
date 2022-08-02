@@ -39,8 +39,8 @@ def create_app():
     """Create Flask application"""
     # Initialize flask app and database model.
     app = Flask(__name__, instance_relative_config=False)
-    # app.config.from_object("config.DevConfig")
-    app.config.from_object("config.ProdConfig")
+    app.config.from_object("config.DevConfig")
+    # app.config.from_object("config.ProdConfig")
     app.url_map.strict_slashes = False
     app.jinja_env.filters["file_type"] = file_type
 

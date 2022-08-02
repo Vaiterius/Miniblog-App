@@ -96,3 +96,23 @@ def extract_img_url(page_data):
 def extract_key_from_url(url):
     """Given an s3 object url, return the key (filename)"""
     return urlparse(url).path.strip("/")
+
+
+# Credits: https://stackoverflow.com/questions/22105315/flask-getting-the-size-of-each-file-in-a-request
+def get_size(fobj):
+    """Get file upload size for validation"""
+    if fobj.content_length:
+        return fobj.content_length
+
+    try:
+        pos = fobj.tell()
+        fobj.seek(0, 2)  #seek to end
+        size = fobj.tell()
+        fobj.seek(pos)  # back to original position
+        return size
+    except (AttributeError, IOError):
+        pass
+
+    # in-memory file object that doesn't support seeking or tell
+    return 0  #assume small enough
+
