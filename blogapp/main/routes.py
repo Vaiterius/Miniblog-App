@@ -1,5 +1,5 @@
 """Routes for main blog components"""
-import os
+from dataclasses import replace
 from flask import (
     Blueprint, Response,
     render_template, make_response, redirect, jsonify,
@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from blogapp import db, fc
 from blogapp.models import Users, Posts, PostLikes, PostComments
 from blogapp.utilities import S3BucketUtils, login_required, extract_img_url,\
-    extract_key_from_url, make_unique_url, get_size
+    extract_key_from_url, make_unique_url, get_size, replace_img_src
 
 # Blueprint creation.
 main_bp = Blueprint(
@@ -148,6 +148,9 @@ def create_post():
         desc = request.form.get("desc")
         content = request.form.get("content").strip()
 
+        # Save content with updated img src links.
+        content = replace_img_src(content)
+
         # Validate required fields.
         if not title or not content:
             flash("Title and content are required!", "error")
@@ -182,7 +185,7 @@ def create_post():
 
         flash("Your post has been uploaded", "success")
 
-        return redirect("/")
+        return redirect(f"/post/id={new_post.id}")
 
     return render_template("create_post.html")
 
@@ -268,7 +271,6 @@ def edit_profile():
 def edit_post(post_id):
     """Interface for user to edit already-existing post"""
 
-    user_id = session["user_id"]
     post = Posts.query.get(post_id)
     current_title = post.title
     current_desc = post.description
@@ -279,6 +281,9 @@ def edit_post(post_id):
         title = request.form.get("title").strip()
         desc = request.form.get("desc")
         content = request.form.get("content").strip()
+
+        # Save content with updated img src links.
+        content = replace_img_src(content)
 
         # If user has deleted some images from editing, delete those orphaned
         # images from the s3 bucket.
@@ -377,28 +382,22 @@ def edit_post(post_id):
 def upload_image():
     """Store file temporarily in folder before uploading to s3 bucket"""
     file = request.files.get("file")
-    print(file)
 
     # Validate filesize, max 1MB.
-    print("DEBUG 1")
     size = get_size(file)
     if size > 1_048_576:
-        print(size)
-        print("DEBUG 2")
-        # abort(Response("400 - file uploads are 1MB max in size"))
-        abort(500)
-    print("DEBUG 3")
+        return abort(Response("500 - image failed to upload"))
 
     if file:
         filename = secure_filename(file.filename).lower()
         filename = make_unique_url(filename)
 
-        # Get publically-accessable s3 URL for uploaded image.
-        location = f"https://flask-bruhlog.s3.us-west-1.amazonaws.com/{filename}"
+        # Get publically-accessable temp s3 URL for uploaded image.
+        location = f"https://flask-bruhlog-temp.s3.us-west-1.amazonaws.com/{filename}"
 
         # Place image in bucket.
-        bucket = S3BucketUtils.get_bucket()
-        bucket.Object(filename).put(Body=file)
+        bucket_temp = S3BucketUtils.get_bucket(use_temp=True)
+        bucket_temp.Object(filename).put(Body=file)
         
         return jsonify({"location": location})
 

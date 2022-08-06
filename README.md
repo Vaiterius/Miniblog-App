@@ -2,6 +2,8 @@
 
 ## Follow bloggers, like articles, comment your thoughts—share with the world!
 
+## Visit the website here: https://flask-bruhlog.herokuapp.com/
+
 ## For the CS50x 2022 final project. Video demo: https://youtu.be/grkiV1PqBM4
 
 
@@ -9,7 +11,7 @@
 A social networking website where users can upload and share whatever is worth posting
 through blogs.
 
-Powered by Python's Flask framework and PostgreSQL. Deployed on the Heroku cloud platform.
+Powered by Python's [Flask](https://flask.palletsprojects.com/en/2.2.x/) framework and SQL. Deployed on the [Heroku](https://www.heroku.com/) cloud platform.
 
 
 ## Features
@@ -17,6 +19,7 @@ Powered by Python's Flask framework and PostgreSQL. Deployed on the Heroku cloud
 - Commenting system
 - Following system
 - Liking system
+- Upload image files from local
 - Editing and deleting posts
 
 ## How It Works
@@ -27,11 +30,14 @@ Data coming in from the client via AJAX or otherwise are passed through Flask PO
 (hopefully) cleansed and inserted into the relational database.
 
 In order for the following/follower system to work, the tables are related through many-to-many
-relationships using an association table from SQLAlchemy, an ORM. Other tables such as user posts
+relationships using an association table from [SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/en/2.x/), an ORM. Other tables such as user posts
 employ a one-to-many relationship, since a user can have many posts.
 
 Some JavaScript magic was at work so when a user hits like on a post, the page does not have to refresh
 to update the DOM, but instead sends an AJAX request so it updates dynamically.
+
+The code also integrates with AWS s3 services using the SDK [boto3](https://aws.amazon.com/sdk-for-python/) library. Images uploaded
+for a blog post are stored in s3 buckets and subsequently edited or deleted as needed.
 
 
 ## Challenges
@@ -39,7 +45,10 @@ Hours and hours upon hours of bugfixing and reading documentation/tutorials. Als
 times trying to implement features on your own without straight up following a tutorial verbatim, but they
 were valuable learning experiences.
 
-I'm not the greatest frontend UI designer so tinkering with the CSS and Javascript was quite time-consuming
+Combining the [TinyMCE WYSIWYG editor](https://www.tiny.cloud/) with the s3 bucket by far was the most time-consuming process, but it
+eventually worked out in the end.
+
+I'm not the greatest frontend UI designer so tinkering with the CSS and Javascript took quite a while
 compared to how much I worked in the Flask and SQL backend.
 
 

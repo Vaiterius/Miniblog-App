@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from flask import redirect, session, current_app
 
 additional_file_types = {
-    ".md": "text/mardown"
+    ".md": "text/markdown"
 }
 
 
@@ -32,12 +32,15 @@ class S3BucketUtils:
         return cls.get_s3_session().resource("s3")
     
     @classmethod
-    def get_bucket(cls):
+    def get_bucket(cls, use_temp=False):
         s3_resource = S3BucketUtils.get_s3_resource()
-        if "bucket" in session:
-            s3_bucket = session["bucket"]
-        else:
-            s3_bucket = current_app.config["S3_BUCKET"]
+        # if "bucket" in session:
+        #     s3_bucket = session["bucket"]
+        # else:
+        #     s3_bucket = current_app.config["S3_BUCKET"]
+        s3_bucket = current_app.config["S3_BUCKET"]
+        if use_temp:
+            s3_bucket = current_app.config["S3_BUCKET_TEMP"]
         return s3_resource.Bucket(s3_bucket)
     
     @classmethod
@@ -115,4 +118,32 @@ def get_size(fobj):
 
     # in-memory file object that doesn't support seeking or tell
     return 0  #assume small enough
+
+
+def replace_img_src(content: str) -> str:
+    """Replace img src with new src from bucket transfer"""
+
+    # Transfer images from temp to actual bucket.
+    soup = BeautifulSoup(content, "html.parser")
+    client = S3BucketUtils.get_s3_session().client("s3")
+    bucket_temp = S3BucketUtils.get_bucket(use_temp=True)
+    bucket_dest = S3BucketUtils.get_bucket()
+
+    for img in soup.findAll("img"):
+        key = extract_key_from_url(img["src"])
+        copy_source = {
+            "Bucket": bucket_temp.name,
+            "Key": key
+        }
+
+        # Don't do anything with image that wasn't changed.
+        if "temp" not in urlparse(img["src"]).netloc:
+            continue
+
+        client.copy_object(   # copy to other bucket
+            Bucket=bucket_dest.name, CopySource=copy_source, Key=key)
+        bucket_temp.Object(key).delete()  # delete from old bucket
+        img["src"] = f"https://flask-bruhlog.s3.us-west-1.amazonaws.com/{key}"
+    
+    return str(soup)
 

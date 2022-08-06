@@ -15,6 +15,7 @@ class Config:
     POSTS_PER_PAGE = int(environ.get("COMMENTS_PER_PAGE"))
 
     S3_BUCKET = environ.get("S3_BUCKET")
+    S3_BUCKET_TEMP = environ.get("S3_BUCKET_TEMP")
     S3_KEY = environ.get("S3_KEY")
     S3_SECRET = environ.get("S3_SECRET")
 

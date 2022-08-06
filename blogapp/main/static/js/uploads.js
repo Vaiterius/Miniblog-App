@@ -4,7 +4,11 @@ document.addEventListener("DOMContentLoaded", function() {
     postSubmitButton.addEventListener("click", function() {
         tinymce.activeEditor.uploadImages()
         .then(() => {
-            document.forms[0].submit();
-        });
+            if (fileSizeOkay) {
+                document.forms[0].submit();
+            } else {
+                fileSizeOkay = true;  // reset for next post
+            }
+        })
     });
 });
