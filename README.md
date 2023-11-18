@@ -1,30 +1,25 @@
 # Bruhlog - A mini blogging application
 
-## Follow bloggers, like articles, comment your thoughts—share with the world!
+*Follow bloggers, like articles, comment your thoughts—share with the world!*
 
-## Visit the website here: https://flask-bruhlog.herokuapp.com/
-
-## For the CS50x 2022 final project. Video demo: https://youtu.be/grkiV1PqBM4
-
-
-## Description
 A social networking website where users can upload and share whatever is worth posting
 through blogs.
 
-Powered by Python's [Flask](https://flask.palletsprojects.com/en/2.2.x/) framework and SQL. Deployed on the [Heroku](https://www.heroku.com/) cloud platform.
+Powered by Python's [Flask](https://flask.palletsprojects.com/en/2.2.x/) framework and PostgreSQL. Deployed on the [Heroku](https://www.heroku.com/) cloud platform and [Fly.io](https://fly.io/).
+
+Visit the website [here](https://flask-bruhlog.herokuapp.com/global).
 
 
 ## Features
-- User account creation and log in system
+- User account creation and login system
 - Commenting system
 - Following system
 - Liking system
-- Upload image files from local
-- Editing and deleting posts
+- Image uploading from your computer
+- Dynamic editing/deletion of posts
 
 ## How It Works
-The website has a development environment with its own SQLite database locally on my computer as
-well as a production copy deployed on the Heroku service platform, but uses PostgreSQL instead.
+The website's production environment runs on Heroku with a connection to a PostgreSQL instance running on Fly.io. The development environment switches to a local SQLite database found locally in the repo.
 
 Data coming in from the client via AJAX or otherwise are passed through Flask POST routes where it is
 (hopefully) cleansed and inserted into the relational database.
@@ -79,6 +74,9 @@ This project would not have existed without the knowledge and education provided
 [Michael Grinberg](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world),
 [Tech With Tim](https://www.youtube.com/playlist?list=PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu),
 and more.
+
+## Video demo 
+For the CS50x 2022 final project. View my demo [here](https://youtu.be/grkiV1PqBM4).
 
 
 ### This was CS50x!
