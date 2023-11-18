@@ -34,10 +34,6 @@ class S3BucketUtils:
     @classmethod
     def get_bucket(cls, use_temp=False):
         s3_resource = S3BucketUtils.get_s3_resource()
-        # if "bucket" in session:
-        #     s3_bucket = session["bucket"]
-        # else:
-        #     s3_bucket = current_app.config["S3_BUCKET"]
         s3_bucket = current_app.config["S3_BUCKET"]
         if use_temp:
             s3_bucket = current_app.config["S3_BUCKET_TEMP"]

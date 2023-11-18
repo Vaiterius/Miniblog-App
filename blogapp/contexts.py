@@ -1,6 +1,6 @@
 """Context processors and other useful functions"""
 from flask import Blueprint, session
-from sqlalchemy import func, desc, asc
+from sqlalchemy import func
 from datetime import datetime
 
 from blogapp import fc, db

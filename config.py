@@ -8,11 +8,12 @@ load_dotenv(path.join(basedir, ".env"))
 
 class Config:
     """Base configuration"""
-    FLASK_APP = environ.get("FLASK_APP")
-    FLASK_ENV = environ.get("FLASK_ENV")
+    FLASK_APP = "wsgi.py"
+    # FLASK_ENV = "development"
+    FLASK_ENV = "production"
     SECRET_KEY = environ.get("SECRET_KEY")
-    POSTS_PER_PAGE = int(environ.get("POSTS_PER_PAGE"))
-    POSTS_PER_PAGE = int(environ.get("COMMENTS_PER_PAGE"))
+    POSTS_PER_PAGE = 8
+    POSTS_PER_PAGE = 12
 
     S3_BUCKET = environ.get("S3_BUCKET")
     S3_BUCKET_TEMP = environ.get("S3_BUCKET_TEMP")
@@ -28,7 +29,7 @@ class Config:
     TEMPLATES_FOLDER = "templates"
     TEMPLATES_AUTO_RELOAD = True
 
-    LOG_TO_STDOUT = environ.get("LOG_TO_STDOUT")
+    LOG_TO_STDOUT = 1
 
 
 class ProdConfig(Config):
@@ -47,6 +48,6 @@ class DevConfig(Config):
     DEBUG = True
     TESTING = True
 
-    SQLALCHEMY_DATABASE_URI = environ.get("DEV_DATABASE_URI")
+    SQLALCHEMY_DATABASE_URI = "sqlite:///database.db"
     SQLALCHEMY_ECHO = False
 

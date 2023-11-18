@@ -1,5 +1,4 @@
 """Routes for main blog components"""
-from dataclasses import replace
 from flask import (
     Blueprint, Response,
     render_template, make_response, redirect, jsonify,
